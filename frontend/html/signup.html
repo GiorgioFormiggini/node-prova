@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDB Clone - Registrazione</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="../css/signup.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'accent': '#10b981',
+                        'dark-bg': '#0d1117',
+                        'card-bg': '#1f2937',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg min-h-screen flex items-center justify-center p-4">
+
+
+    <div class="w-full max-w-md bg-card-bg p-8 rounded-2xl shadow-2xl border border-gray-700">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-accent mb-2">Crea il tuo account</h2>
+            <p class="text-gray-400">Unisciti alla community per salvare i tuoi film preferiti</p>
+        </div>
+
+
+        <form id="signup-form">
+            <div class="mb-5">
+                <label for="username" class="block text-sm font-medium text-gray-300 mb-2">Nome Utente</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    required
+                    placeholder="Il tuo nome utente preferito"
+                    class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-accent focus:border-accent text-gray-100 transition duration-300"
+                />
+            </div>
+            <div class="mb-5">
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    placeholder="tua.email@esempio.com"
+                    class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-accent focus:border-accent text-gray-100 transition duration-300"
+                />
+            </div>
+            <div class="mb-6">
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    placeholder="Almeno 6 caratteri"
+                    class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-accent focus:border-accent text-gray-100 transition duration-300"
+                />
+            </div>
+
+
+            <button
+                type="submit"
+                class="w-full bg-accent text-white p-3 rounded-xl font-semibold text-lg hover:bg-emerald-500 transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-accent/50 active:scale-[0.98] mt-4"
+            >
+                Registrati
+            </button>
+        </form>
+
+
+        <div class="text-center mt-6">
+            <p class="text-gray-400">Hai già un account? <a href="login.html" class="text-accent hover:text-primary font-medium transition duration-300">Accedi qui</a></p>
+        </div>
+    </div>
+
+
+    <div id="signup-popup" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="w-full max-w-md bg-card-bg p-6 rounded-2xl shadow-2xl border border-gray-700 text-center">
+            <h3 class="text-2xl font-bold text-accent mb-3">Registrazione completata</h3>
+            <p class="text-gray-300 mb-4">Il tuo account è stato creato con successo.</p>
+            <a id="signup-popup-login" href="login.html" class="inline-block bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-600 transition">Vai al Login</a>
+            <button id="signup-popup-close" class="ml-3 inline-block bg-gray-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-500 transition">Chiudi</button>
+        </div>
+    </div>
+    <script src="./js/signup.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDB Clone - Preferiti</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="../css/favorites.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'accent': '#10b981',
+                        'dark-bg': '#0d1117',
+                        'card-bg': '#1f2937',
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-dark-bg min-h-screen text-gray-100 p-4 sm:p-8">
+
+    <header class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+        <h1 class="text-3xl font-bold text-primary tracking-wider">TMDB CLONE</h1>
+        <nav class="flex space-x-4">
+            <a href="home.html" class="text-gray-300 hover:text-accent font-medium transition duration-300">Home</a>
+            <a href="favorites.html" id="favorites-link" class="text-primary font-medium transition duration-300 border-b-2 border-primary">Preferiti</a>
+                <button id="login-link" onclick="location.href='login.html'" class="bg-accent px-3 py-1 rounded-full text-white hover:bg-emerald-500 transition duration-300 shadow-lg">Accedi</button>
+            <a href="signup.html" id="signup-link" class="bg-accent px-3 py-1 rounded-full text-white hover:bg-emerald-500 transition duration-300 shadow-lg">Registrati</a>
+            <button id="logout-button" class="bg-red-600 px-3 py-1 rounded-full text-white hover:bg-red-700 transition duration-300 shadow-lg hidden">
+                Logout
+            </button>
+        </nav>
+    </header>
+    
+    <main id="content-area" class="pb-10 max-w-7xl mx-auto">
+        
+        <h2 class="text-3xl font-bold text-accent mb-6 border-b border-gray-700 pb-2">
+            I Miei Film Preferiti 
+        </h2>
+        
+        <div id="message-box" class="mb-6 hidden"></div>
+
+        <div id="movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            
+            <div class="movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl">
+                <div class="loading-skeleton h-64 w-full"></div>
+                <div class="p-4 space-y-2">
+                    <div class="loading-skeleton h-6 w-3/4"></div>
+                    <div class="loading-skeleton h-4 w-1/2"></div>
+                </div>
+            </div>
+            <div class="movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl hidden sm:block">
+                <div class="loading-skeleton h-64 w-full"></div>
+                <div class="p-4 space-y-2">
+                    <div class="loading-skeleton h-6 w-3/4"></div>
+                    <div class="loading-skeleton h-4 w-1/2"></div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+        
+    <footer class="mt-10 pt-4 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p>&copy; 2025 TMDB Clone. Tutti i diritti riservati.</p>
+    </footer>
+
+    <script>
+        // Controllo accesso ai preferiti - solo utenti loggati
+        if (!localStorage.getItem('token')) {
+            window.location.href = 'login.html';
+        }
+    </script>
+    <script type="module" src="./js/favorites.js"></script>
+    
+</body>
+</html>

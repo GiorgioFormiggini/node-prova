@@ -1,0 +1,31 @@
+/* Stili comuni per tutte le pagine */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    scrollbar-color: #3b82f6 #0d1117; 
+}
+
+/* Loading skeleton animation */
+.loading-skeleton {
+    background-color: #2a313d; 
+    background-image: linear-gradient(
+        90deg,
+        #2a313d,
+        #374151,
+        #2a313d
+    );
+    background-size: 200% 100%;
+    animation: pulse-shine 1.5s infinite linear;
+    border-radius: 0.5rem;
+}
+
+@keyframes pulse-shine {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
