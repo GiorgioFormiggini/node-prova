@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // Importa il modello User per interagire con il DB
-const User = require('./models/user.js');
+const User = require('../models/user.js');
 
 // controler per registrare un nuovo utente su MongoDB
 exports.register = async (req, res) => {
