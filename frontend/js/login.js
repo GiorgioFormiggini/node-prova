@@ -1,42 +1,27 @@
-// Caricamento toast utility
-(function(){
-    var s = document.createElement('script');
-    s.src = './js/toast.js';
-    s.async = false;
-    document.head.appendChild(s);
-})();
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const formData = Object.fromEntries(new FormData(form));
+                // Send email and password to backend for server-side validation
+                const payload = { email: formData.email, password: formData.password };
 
-// Gestione login rapido dalla landing page
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('quick-login-form');
-    if (!form) return;
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('login-email').value;
-        const password = document.getElementById('login-password').value;
-        
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: email, password })
-        });
-        const json = await res.json();
-        
-        if (res.ok && json.token) {
-            localStorage.setItem('token', json.token);
-            window.location.href = 'home.html';
-        } else {
-            showToast(json.message || 'Login fallito', 'error');
-        }
-    });
-});
+                try {
+                    const res = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
 
-// Gestione logout
-document.addEventListener('DOMContentLoaded', () => {
-    const logout = document.getElementById('logout-button');
-    if (!logout) return;
-    logout.addEventListener('click', () => {
-        localStorage.removeItem('token');
-        window.location.href = 'index.html';
-    });
-});
+                    const json = await res.json().catch(() => ({ success: false }));
+
+                    if (res.ok && json.token) {
+                        localStorage.setItem('token', json.token);
+                        window.location.href = 'home.html';
+                    } else {
+                        showToast(json.message || 'Credenziali non valide', 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Impossibile eseguire il login. Riprova.', 'error');
+                }
+            });

@@ -5,6 +5,7 @@ const path = require('path');
 // Carica le variabili d'ambiente dal file .env nella stessa cartella di server.js
 require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
+const cors = require('cors'); // Importa il modulo cors
 const bcrypt = require('bcrypt');       // Hashing delle password
 const jwt = require('jsonwebtoken');    // Generazione di token JWT
 
@@ -26,6 +27,7 @@ connectDB();
 
 // MIDDLEWARE DI BASE
 app.use(express.json()); // Permette di leggere il corpo delle richieste in formato JSON
+app.use(cors()); // Abilita CORS per tutte le richieste
 
 // Serve i file statici del frontend (cartella ../frontend rispetto a src)
 app.use(express.static(path.join(__dirname, '../frontend')));
