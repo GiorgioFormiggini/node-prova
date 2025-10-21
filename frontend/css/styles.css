@@ -1,0 +1,56 @@
+/* Importa il font Inter da Google Fonts per uno stile moderno e leggibile */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+body {
+    /* Imposta Inter come font predefinito */
+    font-family: 'Inter', sans-serif;
+    /* Rende lo scrollbar scuro per adattarsi al tema */
+    scrollbar-color: #3b82f6 #0d1117; 
+}
+
+/* Stili per le card placeholder (skeleton loading) */
+.loading-skeleton {
+    /* Colore di base scuro per lo scheletro */
+    background-color: #2a313d; 
+    /* Aggiunge il gradiente animato */
+    background-image: linear-gradient(
+        90deg,
+        #2a313d,
+        #374151, /* Colore intermedio per l'effetto di movimento */
+        #2a313d
+    );
+    background-size: 200% 100%;
+    animation: pulse-shine 1.5s infinite linear;
+    border-radius: 0.5rem; /* angoli arrotondati */
+}
+
+@keyframes pulse-shine {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Stile specifico per il contenitore WELCOME nella pagina index.html */
+#welcome-container {
+    background-color: #0d1117; /* Sfondo scuro */
+    position: relative;
+    overflow: hidden;
+}
+
+#welcome-container::before {
+    content: "WELCOME";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Stile grande e semi-trasparente */
+    font-size: 15vw; 
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.05); /* Testo bianco molto trasparente */
+    z-index: 0;
+    user-select: none;
+    pointer-events: none;
+}
