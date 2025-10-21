@@ -52,9 +52,9 @@
 <body class="bg-dark-bg min-h-screen text-gray-100 p-4 sm:p-8">
 
     <!-- Intestazione e Navigazione -->
-    <header class="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+    <header class="flex flex-col sm:flex-row justify-between items-center mb-0 gap-4">
         <h1 class="text-3xl font-bold text-primary tracking-wider">TMDB CLONE</h1>
-    <div id="welcome-msg" class="text-sm text-gray-300 ml-0 mt-1"></div>
+    <div id="welcome-msg" class="text-sm text-gray-300 ml-0 mt-1 hidden"></div>
         <nav class="flex space-x-4">
             <a href="home.html" class="text-primary hover:text-accent font-medium transition duration-300 border-b-2 border-primary">Home</a>
             <a href="favorites.html" id="favorites-link" class="text-gray-300 hover:text-accent font-medium transition duration-300">Preferiti</a>
@@ -68,7 +68,7 @@
     </header>
 
     <!-- Barra di Ricerca (left-aligned) -->
-    <section class="mb-10 max-w-4xl">
+    <section class="mb-10 max-w-4xl mx-auto">
         <div class="relative">
             <input
                 type="text"
