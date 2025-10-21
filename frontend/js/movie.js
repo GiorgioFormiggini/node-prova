@@ -1,52 +1,9 @@
+// Cache film visti
+const watchedSet = new Set();
+
 // Utility: estrae parametro query dalla URL
 function getQueryParam(name) {
     return new URLSearchParams(window.location.search).get(name);
-}
-
-// Utility: normalizza oggetto dettagli film
-function asDetails(obj) {
-    if (!obj) return null;
-    if (obj.details) return Object.assign({}, obj, obj.details);
-    return obj;
-}
-
-// Verifica se film è nei preferiti
-async function isFavorite(tmdbId) {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return false;
-        const res = await fetch('/api/movies/favorites', { headers: { 'Authorization': `Bearer ${token}` } });
-        if (!res.ok) return false;
-        const j = await res.json();
-        if (!j.favorites) return false;
-        return j.favorites.some(f => Number(f.tmdbId) === Number(tmdbId));
-    } catch (e) { return false; }
-}
-
-// Toggle preferito
-async function toggleFavorite(tmdbId, title, btn) {
-    const token = localStorage.getItem('token');
-    if (!token) return showToast('Effettua il login per salvare i preferiti', 'warn');
-    try {
-        const res = await fetch('/api/movies/favorites', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            body: JSON.stringify({ tmdbId: Number(tmdbId), title, isFavorite: true })
-        });
-        if (res.status === 409) {
-            showToast('Già aggiunto ai preferiti', 'warn');
-            return null;
-        }
-        if (!res.ok) throw new Error('Errore salvataggio');
-        const j = await res.json();
-        btn.innerText = 'Aggiunto ai preferiti';
-        btn.classList.remove('bg-primary');
-        btn.classList.add('bg-green-600');
-        btn.disabled = true;
-        return j;
-    } catch (err) {
-        showToast('Impossibile salvare il preferito', 'error');
-    }
 }
 
 // Caricamento dettagli film
@@ -54,10 +11,10 @@ async function loadMovie() {
     const id = getQueryParam('id');
     const container = document.getElementById('movie-details-container');
     if (!id) return container.innerText = 'ID film mancante';
+    
     const res = await fetch(`/api/movies/${id}`);
-    if (!res.ok) return container.innerText = 'Errore caricamento film';
     const json = await res.json();
-    const d = asDetails(json);
+    const d = json.details || json;
 
     const genres = (d.genres && Array.isArray(d.genres)) ? d.genres.map(g => g.name || g).join(', ') : (d.genre_names || '—');
     const runtime = d.runtime ? `${d.runtime} min` : '—';
@@ -98,84 +55,80 @@ async function loadMovie() {
 
     const favBtn = document.getElementById('fav-btn');
     const watchedBtn = document.getElementById('watched-btn');
-    const already = await isFavorite(id);
-    if (already) {
+
+    // Recupero stato preferito/visto
+    async function getStatusAPI(tmdbId) {
+        const token = localStorage.getItem('token');
+        if (!token) return { isFavorite: false, isWatched: false };
+        const res = await fetch(`/api/movies/status/${tmdbId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+        if (!res.ok) return { isFavorite: false, isWatched: false };
+        const j = await res.json();
+        return j.status || { isFavorite: false, isWatched: false };
+    }
+
+    const st = await getStatusAPI(id);
+    
+    if (st.isFavorite) {
         favBtn.innerText = 'Già nei preferiti';
         favBtn.classList.remove('bg-primary');
         favBtn.classList.add('bg-green-600');
     }
 
-    // Recupero stato preferito/visto
-    async function getStatusAPI(tmdbId) {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) return { isFavorite: false, isWatched: false };
-            const res = await fetch(`/api/movies/status/${tmdbId}`, { headers: { 'Authorization': `Bearer ${token}` } });
-            if (!res.ok) return { isFavorite: false, isWatched: false };
-            const j = await res.json();
-            return j.status || { isFavorite: false, isWatched: false };
-        } catch (e) { return { isFavorite: false, isWatched: false }; }
-    }
-
-    // Inizializzazione bottone visto
-    if (watchedBtn) {
-        const st = await getStatusAPI(id);
-        
-        function setDetailWatchedVisual(el, watched) {
-            if (watched) {
-                el.innerText = 'Visto';
-                el.classList.remove('bg-gray-700');
-                el.classList.add('bg-green-600','border-green-600','text-white');
-            } else {
-                el.innerText = 'Segna come visto';
-                el.classList.remove('bg-green-600','border-green-600','text-white');
-                el.classList.add('bg-gray-700');
-            }
+    // Handler bottone visto
+    function setDetailWatchedVisual(el, watched) {
+        if (watched) {
+            el.innerText = 'Visto';
+            el.classList.remove('bg-gray-700');
+            el.classList.add('bg-green-600','border-green-600','text-white');
+        } else {
+            el.innerText = 'Segna come visto';
+            el.classList.remove('bg-green-600','border-green-600','text-white');
+            el.classList.add('bg-gray-700');
         }
-
-        setDetailWatchedVisual(watchedBtn, st.isWatched);
-
-        watchedBtn.addEventListener('click', async () => {
-            const token = localStorage.getItem('token');
-            if (!token) return showToast('Effettua il login per segnare come visto', 'warn');
-            const shouldMark = !(st.isWatched || watchedSet.has(Number(id)));
-            setDetailWatchedVisual(watchedBtn, shouldMark);
-
-            try {
-                const res = await fetch('/api/movies/watched', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ tmdbId: Number(id), isWatched: shouldMark })
-                });
-                if (!res.ok) {
-                    showToast('Impossibile aggiornare lo stato visto', 'error');
-                    setDetailWatchedVisual(watchedBtn, !shouldMark);
-                    return;
-                }
-                const j = await res.json();
-                if (j.success) {
-                    if (shouldMark) { watchedSet.add(Number(id)); showToast('Film segnato come visto', 'success'); }
-                    else { watchedSet.delete(Number(id)); showToast('Film marcato come non visto', 'info'); }
-                    st.isWatched = shouldMark;
-                } else {
-                    setDetailWatchedVisual(watchedBtn, !shouldMark);
-                    showToast('Impossibile aggiornare lo stato', 'error');
-                }
-            } catch (err) {
-                showToast('Errore di rete', 'error');
-                setDetailWatchedVisual(watchedBtn, !shouldMark);
-            }
-        });
     }
+
+    setDetailWatchedVisual(watchedBtn, st.isWatched);
+
+    watchedBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('token');
+        if (!token) return alert('Effettua il login per segnare come visto');
+        const shouldMark = !st.isWatched;
+        setDetailWatchedVisual(watchedBtn, shouldMark);
+
+        const res = await fetch('/api/movies/watched', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ tmdbId: Number(id), isWatched: shouldMark })
+        });
+        const j = await res.json();
+        
+        if (j.success) {
+            if (shouldMark) { watchedSet.add(Number(id)); }
+            else { watchedSet.delete(Number(id)); }
+            st.isWatched = shouldMark;
+        } else {
+            setDetailWatchedVisual(watchedBtn, !shouldMark);
+        }
+    });
 
     // Handler salva preferito
     favBtn.addEventListener('click', async () => {
         const token = localStorage.getItem('token');
-        if (!token) return showToast('Effettua il login per salvare i preferiti', 'warn');
-        if (await isFavorite(id)) {
-            return showToast('Già aggiunto ai preferiti', 'warn');
+        if (!token) return alert('Effettua il login per salvare i preferiti');
+        
+        const res = await fetch('/api/movies/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ tmdbId: Number(id), title: d.title || d.name, isFavorite: true })
+        });
+        const j = await res.json();
+        
+        if (res.ok) {
+            favBtn.innerText = 'Aggiunto ai preferiti';
+            favBtn.classList.remove('bg-primary');
+            favBtn.classList.add('bg-green-600');
+            favBtn.disabled = true;
         }
-        await toggleFavorite(id, d.title || d.name, favBtn);
     });
 }
 

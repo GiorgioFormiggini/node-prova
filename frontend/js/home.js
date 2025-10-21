@@ -1,32 +1,33 @@
+// Cache preferiti e film visti
+const favoriteSet = new Set();
+const watchedSet = new Set();
+
 // Caricamento film popolari
 async function fetchPopular() {
-    try {
-        const r = await fetch('/api/movies/popular');
-        if (!r.ok) return console.error('Errore fetching popular');
-        const data = await r.json();
-        const list = document.getElementById('movie-list');
-        list.innerHTML = '';
-        (data.results || []).forEach(m => {
-            const card = document.createElement('div');
-            card.className = 'movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl transition duration-500 hover:scale-[1.03] hover:shadow-primary/50 cursor-pointer';
-            card.innerHTML = `
-                <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${m.title}" class="w-full h-64 object-cover" />
-                <div class="p-4">
-                  <h3 class="text-lg font-semibold">${m.title}</h3>
-                  <p class="text-sm text-gray-400">${m.release_date || ''}</p>
-                  <div class="flex justify-between mt-2 items-center">
-                    <div class="flex gap-2">
-                      <button data-tmdb="${m.id}" class="add-fav bg-primary text-white px-3 py-1 rounded">Aggiungi</button>
-                      <button data-tmdb="${m.id}" class="show-details bg-gray-700 text-white px-3 py-1 rounded">Dettagli</button>
-                    </div>
-                    <button data-tmdb="${m.id}" title="Segna come visto" class="mark-watched text-gray-300 bg-gray-800 px-3 py-1 min-w-[80px] rounded-md border-2 border-gray-700">Visto</button>
-                  </div>
-                </div>`;
-            list.appendChild(card);
-        });
-        attachAddFavHandlers();
-        attachMarkWatchedHandlers();
-    } catch (err) { console.error(err); }
+    const r = await fetch('/api/movies/popular');
+    const data = await r.json();
+    const list = document.getElementById('movie-list');
+    list.innerHTML = '';
+    (data.results || []).forEach(m => {
+        const card = document.createElement('div');
+        card.className = 'movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl transition duration-500 hover:scale-[1.03] hover:shadow-primary/50 cursor-pointer';
+        card.innerHTML = `
+            <img src="https://image.tmdb.org/t/p/w500${m.poster_path}" alt="${m.title}" class="w-full h-64 object-cover" />
+            <div class="p-4">
+              <h3 class="text-lg font-semibold">${m.title}</h3>
+              <p class="text-sm text-gray-400">${m.release_date || ''}</p>
+              <div class="flex justify-between mt-2 items-center">
+                <div class="flex gap-2">
+                  <button data-tmdb="${m.id}" class="add-fav bg-primary text-white px-3 py-1 rounded">Aggiungi</button>
+                  <button data-tmdb="${m.id}" class="show-details bg-gray-700 text-white px-3 py-1 rounded">Dettagli</button>
+                </div>
+                <button data-tmdb="${m.id}" title="Segna come visto" class="mark-watched text-gray-300 bg-gray-800 px-3 py-1 min-w-[80px] rounded-md border-2 border-gray-700">Visto</button>
+              </div>
+            </div>`;
+        list.appendChild(card);
+    });
+    attachAddFavHandlers();
+    attachMarkWatchedHandlers();
 }
 
 // Ricerca film
@@ -58,32 +59,24 @@ document.getElementById('search-input').addEventListener('keyup', async (e) => {
     });
 });
 
-// Cache preferiti e film visti
-const favoriteSet = new Set();
-const watchedSet = new Set();
-
 // Caricamento preferiti utente
 async function loadUserFavoritesToCache() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const res = await fetch('/api/movies/favorites', { headers: { 'Authorization': `Bearer ${token}` } });
-        if (!res.ok) return;
-        const j = await res.json();
-        (j.favorites || []).forEach(f => favoriteSet.add(Number(f.tmdbId)));
-    } catch (e) { console.error('fav cache load', e); }
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const res = await fetch('/api/movies/favorites', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!res.ok) return;
+    const j = await res.json();
+    (j.favorites || []).forEach(f => favoriteSet.add(Number(f.tmdbId)));
 }
 
 // Caricamento film visti utente
 async function loadUserWatchedToCache() {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-        const res = await fetch('/api/movies/watched', { headers: { 'Authorization': `Bearer ${token}` } });
-        if (!res.ok) return;
-        const j = await res.json();
-        (j.watched || []).forEach(f => watchedSet.add(Number(f.tmdbId)));
-    } catch (e) { console.error('watched cache load', e); }
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const res = await fetch('/api/movies/watched', { headers: { 'Authorization': `Bearer ${token}` } });
+    if (!res.ok) return;
+    const j = await res.json();
+    (j.watched || []).forEach(f => watchedSet.add(Number(f.tmdbId)));
 }
 
 // Handler aggiungi ai preferiti
@@ -94,22 +87,18 @@ function attachAddFavHandlers() {
         btn.addEventListener('click', async (e) => {
             const id = Number(e.target.dataset.tmdb);
             const token = localStorage.getItem('token');
-            if (!token) return showToast('Effettua il login per salvare i preferiti', 'warn');
-            if (favoriteSet.has(id)) return showToast('Già aggiunto ai preferiti', 'warn');
+            if (!token) return alert('Effettua il login per salvare i preferiti');
+            
             const res = await fetch('/api/movies/favorites', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                 body: JSON.stringify({ tmdbId: id, title: e.target.closest('.movie-card').querySelector('h3').innerText, isFavorite: true })
             });
-            if (res.status === 409) {
-                favoriteSet.add(id);
-                return showToast('Già aggiunto ai preferiti', 'warn');
-            }
             const json = await res.json();
-            if (json.success) {
+            
+            if (res.ok && json.success) {
                 favoriteSet.add(id);
-                showToast('Aggiunto ai preferiti', 'success');
-            } else showToast('Errore', 'error');
+            }
         });
     });
 }
@@ -138,29 +127,22 @@ function attachMarkWatchedHandlers() {
         btn.addEventListener('click', async (e) => {
             const id = Number(e.currentTarget.dataset.tmdb);
             const token = localStorage.getItem('token');
-            if (!token) return showToast('Effettua il login per segnare come visto', 'warn');
+            if (!token) return alert('Effettua il login per segnare come visto');
             const shouldMark = !watchedSet.has(id);
             setWatchedVisual(e.currentTarget, shouldMark);
 
-            try {
-                const res = await fetch('/api/movies/watched', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ tmdbId: id, isWatched: shouldMark })
-                });
-                if (!res.ok) throw new Error('Errore update watched');
-                const j = await res.json();
-                if (j.success) {
-                    if (shouldMark) { watchedSet.add(id); showToast('Segnato come visto', 'success'); }
-                    else { watchedSet.delete(id); showToast('Segnato come non visto', 'info'); }
-                } else {
-                    setWatchedVisual(e.currentTarget, !shouldMark);
-                    showToast('Impossibile aggiornare lo stato', 'error');
-                }
-            } catch (err) {
-                console.error(err);
+            const res = await fetch('/api/movies/watched', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                body: JSON.stringify({ tmdbId: id, isWatched: shouldMark })
+            });
+            const j = await res.json();
+            
+            if (j.success) {
+                if (shouldMark) { watchedSet.add(id); }
+                else { watchedSet.delete(id); }
+            } else {
                 setWatchedVisual(e.currentTarget, !shouldMark);
-                showToast('Errore di rete', 'error');
             }
         });
     });
@@ -177,11 +159,9 @@ function attachMarkWatchedHandlers() {
     const welcome = document.getElementById('welcome-msg');
     
     function parseJwt(t) {
-        try {
-            const payload = t.split('.')[1];
-            const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-            return JSON.parse(decodeURIComponent(escape(json)));
-        } catch (e) { return null; }
+        const payload = t.split('.')[1];
+        const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+        return JSON.parse(decodeURIComponent(escape(json)));
     }
     
     if (token) {
@@ -213,28 +193,25 @@ document.body.insertAdjacentHTML('beforeend', modalHtml);
 
 // Mostra dettagli film in modal
 async function showMovieDetails(tmdbId) {
-    try {
-        const r = await fetch(`/api/movies/${tmdbId}`);
-        if (!r.ok) return showToast('Impossibile caricare i dettagli', 'error');
-        const movie = await r.json();
-        const c = document.getElementById('details-content');
-        c.innerHTML = `
-            <div class="flex gap-6">
-                <div class="w-1/3">
-                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path || movie.details?.poster_path || ''}" class="w-full rounded" />
-                </div>
-                <div class="w-2/3">
-                    <h2 class="text-2xl font-bold mb-2">${movie.title || movie.details?.title || ''}</h2>
-                    <p class="text-gray-300 mb-4">${movie.details?.overview || movie.overview || ''}</p>
-                    <p class="text-sm text-gray-400">Release: ${movie.release_date || movie.details?.release_date || ''}</p>
-                    <p class="mt-3">Runtime: ${movie.details?.runtime || 'N/A'} min</p>
-                    <p class="mt-3">Rating: ${movie.vote_average || movie.details?.vote_average || 'N/A'}</p>
-                </div>
-            </div>`;
-        const modal = document.getElementById('details-modal');
-        modal.classList.remove('hidden');
-        document.getElementById('details-close').onclick = () => modal.classList.add('hidden');
-    } catch (err) { console.error(err); showToast('Errore di rete', 'error'); }
+    const r = await fetch(`/api/movies/${tmdbId}`);
+    const movie = await r.json();
+    const c = document.getElementById('details-content');
+    c.innerHTML = `
+        <div class="flex gap-6">
+            <div class="w-1/3">
+                <img src="https://image.tmdb.org/t/p/w500${movie.poster_path || movie.details?.poster_path || ''}" class="w-full rounded" />
+            </div>
+            <div class="w-2/3">
+                <h2 class="text-2xl font-bold mb-2">${movie.title || movie.details?.title || ''}</h2>
+                <p class="text-gray-300 mb-4">${movie.details?.overview || movie.overview || ''}</p>
+                <p class="text-sm text-gray-400">Release: ${movie.release_date || movie.details?.release_date || ''}</p>
+                <p class="mt-3">Runtime: ${movie.details?.runtime || 'N/A'} min</p>
+                <p class="mt-3">Rating: ${movie.vote_average || movie.details?.vote_average || 'N/A'}</p>
+            </div>
+        </div>`;
+    const modal = document.getElementById('details-modal');
+    modal.classList.remove('hidden');
+    document.getElementById('details-close').onclick = () => modal.classList.add('hidden');
 }
 
 // Observer per gestione click dettagli

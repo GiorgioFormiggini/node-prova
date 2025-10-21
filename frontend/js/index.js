@@ -12,24 +12,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!form) return;
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
+        const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
-        try {
-            const res = await fetch('/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: email, password })
-            });
-            const json = await res.json();
-            if (res.ok && json.token) {
-                localStorage.setItem('token', json.token);
-                window.location.href = 'home.html';
-            } else {
-                showToast(json.message || 'Login fallito', 'error');
-            }
-        } catch (err) {
-            console.error(err);
-            showToast('Errore di rete durante il login', 'error');
+        
+        const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: email, password })
+        });
+        const json = await res.json();
+        
+        if (res.ok && json.token) {
+            localStorage.setItem('token', json.token);
+            window.location.href = 'home.html';
+        } else {
+            showToast(json.message || 'Login fallito', 'error');
         }
     });
 });

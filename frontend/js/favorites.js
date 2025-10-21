@@ -13,16 +13,13 @@
     if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem('token'); location.reload(); });
 })();
 
+// Cache film visti
+const watchedSet = new Set();
+
 // Caricamento lista preferiti
 async function loadFavorites() {
     const token = localStorage.getItem('token');
-    if (!token) {
-        document.getElementById('message-box').classList.remove('hidden');
-        document.getElementById('message-box').innerText = 'Devi effettuare il login per vedere i preferiti.';
-        return;
-    }
     const res = await fetch('/api/movies/favorites', { headers: { 'Authorization': `Bearer ${token}` } });
-    if (!res.ok) return showToast('Errore caricamento preferiti', 'error');
     const json = await res.json();
     const list = document.getElementById('movie-list');
     list.innerHTML = '';
@@ -49,8 +46,8 @@ async function loadFavorites() {
         btn.addEventListener('click', async (e) => {
             const id = e.target.dataset.tmdb;
             const token = localStorage.getItem('token');
-            const r = await fetch(`/api/movies/favorites/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-            if (r.ok) { loadFavorites(); } else showToast('Errore rimuovendo preferito', 'error');
+            await fetch(`/api/movies/favorites/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+            loadFavorites();
         });
     });
 
@@ -73,7 +70,6 @@ async function loadFavorites() {
         btn.addEventListener('click', async (e) => {
             const id = Number(e.currentTarget.dataset.tmdb);
             const token = localStorage.getItem('token');
-            if (!token) return showToast('Effettua il login per segnare come visto', 'warn');
             const shouldMark = !watchedSet.has(id);
 
             if (shouldMark) {
@@ -86,27 +82,17 @@ async function loadFavorites() {
                 e.currentTarget.classList.add('bg-gray-800','border-gray-700','text-gray-300');
             }
 
-            try {
-                const res = await fetch('/api/movies/watched', { method: 'POST', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ tmdbId: id, isWatched: shouldMark }) });
-                if (!res.ok) throw new Error('Impossibile aggiornare');
-                const j = await res.json();
-                if (j.success) {
-                    if (shouldMark) { watchedSet.add(id); showToast('Segnato come visto', 'success'); }
-                    else { watchedSet.delete(id); showToast('Segnato come non visto', 'info'); }
-                } else {
-                    if (shouldMark) {
-                        e.currentTarget.innerText = 'Segna come visto';
-                        e.currentTarget.classList.remove('bg-green-600','border-green-600','text-white');
-                        e.currentTarget.classList.add('bg-gray-800','border-gray-700','text-gray-300');
-                    } else {
-                        e.currentTarget.innerText = 'Visto';
-                        e.currentTarget.classList.add('bg-green-600','border-green-600','text-white');
-                        e.currentTarget.classList.remove('bg-gray-800','border-gray-700','text-gray-300');
-                    }
-                    showToast('Impossibile aggiornare lo stato', 'error');
-                }
-            } catch (err) {
-                console.error(err);
+            const res = await fetch('/api/movies/watched', { 
+                method: 'POST', 
+                headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, 
+                body: JSON.stringify({ tmdbId: id, isWatched: shouldMark }) 
+            });
+            const j = await res.json();
+            
+            if (j.success) {
+                if (shouldMark) { watchedSet.add(id); }
+                else { watchedSet.delete(id); }
+            } else {
                 if (shouldMark) {
                     e.currentTarget.innerText = 'Segna come visto';
                     e.currentTarget.classList.remove('bg-green-600','border-green-600','text-white');
@@ -116,7 +102,6 @@ async function loadFavorites() {
                     e.currentTarget.classList.add('bg-green-600','border-green-600','text-white');
                     e.currentTarget.classList.remove('bg-gray-800','border-gray-700','text-gray-300');
                 }
-                showToast('Errore aggiornando visto', 'error');
             }
         });
     });
