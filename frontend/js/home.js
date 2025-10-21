@@ -19,7 +19,7 @@ async function fetchPopular() {
               <div class="flex justify-between mt-2 items-center">
                 <div class="flex gap-2">
                   <button data-tmdb="${m.id}" class="add-fav bg-primary text-white px-3 py-1 rounded">Aggiungi</button>
-                  <button data-tmdb="${m.id}" class="show-details bg-gray-700 text-white px-3 py-1 rounded">Dettagli</button>
+                  <button data-tmdbid="${m.id}" class="details-button bg-blue-600 text-white px-3 py-1 rounded">Dettagli</button>
                 </div>
                 <button data-tmdb="${m.id}" title="Segna come visto" class="mark-watched text-gray-300 bg-gray-800 px-3 py-1 min-w-[80px] rounded-md border-2 border-gray-700">Visto</button>
               </div>
@@ -28,6 +28,7 @@ async function fetchPopular() {
     });
     attachAddFavHandlers();
     attachMarkWatchedHandlers();
+    attachDetailsButtonHandlers();
 }
 
 // Ricerca film
@@ -50,13 +51,16 @@ document.getElementById('search-input').addEventListener('keyup', async (e) => {
               <div class="flex justify-between mt-2 items-center">
                 <div class="flex gap-2">
                   <button data-tmdb="${m.id}" class="add-fav bg-primary text-white px-3 py-1 rounded">Aggiungi</button>
-                  <button data-tmdb="${m.id}" class="show-details bg-gray-700 text-white px-3 py-1 rounded">Dettagli</button>
+                  <button data-tmdbid="${m.id}" class="details-button bg-blue-600 text-white px-3 py-1 rounded">Dettagli</button>
                 </div>
                 <button data-tmdb="${m.id}" title="Segna come visto" class="mark-watched text-gray-300 bg-gray-800 px-2 py-1 rounded-md">Visto</button>
               </div>
             </div>`;
         list.appendChild(card);
     });
+    attachAddFavHandlers();
+    attachMarkWatchedHandlers();
+    attachDetailsButtonHandlers();
 });
 
 // Caricamento preferiti utente
@@ -82,26 +86,37 @@ async function loadUserWatchedToCache() {
 // Handler aggiungi ai preferiti
 function attachAddFavHandlers() {
     document.querySelectorAll('.add-fav').forEach(btn => {
-        if (btn.dataset.bound) return;
-        btn.dataset.bound = '1';
-        btn.addEventListener('click', async (e) => {
-            const id = Number(e.target.dataset.tmdb);
-            const token = localStorage.getItem('token');
-            if (!token) return alert('Effettua il login per salvare i preferiti');
-            
-            const res = await fetch('/api/movies/favorites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                body: JSON.stringify({ tmdbId: id, title: e.target.closest('.movie-card').querySelector('h3').innerText, isFavorite: true })
-            });
-            const json = await res.json();
-            
-            if (res.ok && json.success) {
-                favoriteSet.add(id);
-            }
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', async (e) => {
+        const id = Number(e.target.dataset.tmdb);
+        const token = localStorage.getItem('token');
+        if (!token) return alert('Effettua il login per salvare i preferiti');
+        
+        const res = await fetch('/api/movies/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ tmdbId: id, title: e.target.closest('.movie-card').querySelector('h3').innerText, isFavorite: true })
         });
+        const json = await res.json();
+        
+        if (res.ok && json.success) {
+            favoriteSet.add(id);
+        }
     });
+});
 }
+
+function attachDetailsButtonHandlers() {
+     document.querySelectorAll('.details-button').forEach(btn => {
+         if (btn.dataset.boundDetails) return;
+         btn.dataset.boundDetails = '1';
+         btn.addEventListener('click', (e) => {
+             const tmdbId = e.target.dataset.tmdbid;
+             showMovieDetails(tmdbId);
+         });
+     });
+ }
 
 // Handler segna come visto
 function attachMarkWatchedHandlers() {
@@ -181,38 +196,73 @@ function attachMarkWatchedHandlers() {
     if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem('token'); location.reload(); });
 })();
 
-// Modal dettagli film
-const modalHtml = `
-    <div id="details-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-60">
-        <div class="max-w-4xl w-full bg-card-bg rounded-2xl p-6 relative">
-            <button id="details-close" class="absolute right-4 top-4 bg-gray-700 text-white px-3 py-1 rounded">Chiudi</button>
-            <div id="details-content" class="mt-4"></div>
-        </div>
-    </div>`;
-document.body.insertAdjacentHTML('beforeend', modalHtml);
+
 
 // Mostra dettagli film in modal
+// Mostra dettagli film in modal
 async function showMovieDetails(tmdbId) {
-    const r = await fetch(`/api/movies/${tmdbId}`);
-    const movie = await r.json();
-    const c = document.getElementById('details-content');
-    c.innerHTML = `
-        <div class="flex gap-6">
-            <div class="w-1/3">
-                <img src="https://image.tmdb.org/t/p/w500${movie.poster_path || movie.details?.poster_path || ''}" class="w-full rounded" />
-            </div>
-            <div class="w-2/3">
-                <h2 class="text-2xl font-bold mb-2">${movie.title || movie.details?.title || ''}</h2>
-                <p class="text-gray-300 mb-4">${movie.details?.overview || movie.overview || ''}</p>
-                <p class="text-sm text-gray-400">Release: ${movie.release_date || movie.details?.release_date || ''}</p>
-                <p class="mt-3">Runtime: ${movie.details?.runtime || 'N/A'} min</p>
-                <p class="mt-3">Rating: ${movie.vote_average || movie.details?.vote_average || 'N/A'}</p>
-            </div>
-        </div>`;
-    const modal = document.getElementById('details-modal');
+    const modal = document.getElementById('movie-details-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalPoster = document.getElementById('modal-poster');
+    const modalOverview = document.getElementById('modal-overview');
+    const modalRating = document.getElementById('modal-rating');
+    const modalCast = document.getElementById('modal-cast');
+    const modalTrailer = document.getElementById('modal-trailer');
+    const modalImages = document.getElementById('modal-images');
+
+    // Clear previous content
+    modalTitle.textContent = '';
+    modalPoster.src = '';
+    modalOverview.textContent = '';
+    modalRating.textContent = '';
+    modalCast.textContent = '';
+    modalTrailer.innerHTML = '';
+    modalImages.innerHTML = '';
+
     modal.classList.remove('hidden');
-    document.getElementById('details-close').onclick = () => modal.classList.add('hidden');
+
+    try {
+        const r = await fetch(`/api/movies/${tmdbId}`);
+        const movie = await r.json();
+
+        modalTitle.textContent = movie.title || movie.details?.title || 'N/A';
+        modalPoster.src = `https://image.tmdb.org/t/p/w500${movie.poster_path || movie.details?.poster_path || ''}`;
+        modalOverview.textContent = movie.details?.overview || movie.overview || 'Nessuna trama disponibile.';
+        modalRating.textContent = movie.vote_average ? `${movie.vote_average.toFixed(1)}/10` : 'N/A';
+
+        // Fetch additional details like cast, trailer, images
+        const detailsRes = await fetch(`/api/movies/${tmdbId}/details`);
+        const details = await detailsRes.json();
+
+        if (details.cast && details.cast.length > 0) {
+            modalCast.textContent = details.cast.map(c => c.name).slice(0, 5).join(', ');
+        } else {
+            modalCast.textContent = 'N/A';
+        }
+
+        if (details.trailer) {
+            modalTrailer.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${details.trailer}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+        }
+
+        if (details.images && details.images.length > 0) {
+            details.images.slice(0, 6).forEach(img => {
+                const imgElement = document.createElement('img');
+                imgElement.src = `https://image.tmdb.org/t/p/w500${img}`;
+                imgElement.className = 'w-full h-32 object-cover rounded-lg shadow-md';
+                modalImages.appendChild(imgElement);
+            });
+        }
+
+    } catch (error) {
+        console.error('Errore nel caricamento dei dettagli del film:', error);
+        modalTitle.textContent = 'Errore';
+        modalOverview.textContent = 'Impossibile caricare i dettagli del film.';
+    }
 }
+
+document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('movie-details-modal').classList.add('hidden');
+});
 
 // Observer per gestione click dettagli
 const observer = new MutationObserver(() => {
@@ -223,4 +273,3 @@ const observer = new MutationObserver(() => {
     });
 });
 observer.observe(document.getElementById('movie-list'), { childList: true, subtree: true });
-        
