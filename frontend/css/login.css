@@ -1,0 +1,28 @@
+#welcome-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#welcome-text {
+    font-size: 8rem; 
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.05); 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    line-height: 1;
+}
+
+@media (max-width: 640px) {
+    #welcome-text {
+        font-size: 5rem;
+    }
+}

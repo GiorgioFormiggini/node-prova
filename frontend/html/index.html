@@ -1,111 +1,120 @@
 <!DOCTYPE html>
 <html lang="it">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TMDB Clone - Benvenuto</title>
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TMDB Clone - Home & Ricerca</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="../css/index.css">
     <script>
-      tailwind.config = {
-          theme: {
-              extend: {
-                  colors: {
-                      'primary': '#3b82f6', 
-                      'accent': '#10b981', 
-                      'dark-bg': '#0d1117',
-                      'card-bg': '#1f2937',
-                  },
-              }
-          }
-      }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#3b82f6',
+                        'accent': '#10b981',
+                        'dark-bg': '#0d1117',
+                        'card-bg': '#1f2937',
+                    },
+                }
+            }
+        }
     </script>
-    <style>
-      #welcome-container {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          position: relative;
-          overflow: hidden;
-      }
-      #welcome-text {
-          font-size: 8rem; 
-          font-weight: 900;
-          color: rgba(255, 255, 255, 0.05); 
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          pointer-events: none;
-          line-height: 1;
-      }
-      @media (max-width: 640px) {
-          #welcome-text {
-              font-size: 5rem;
-          }
-      }
-    </style>
-  </head>
-  <body class="bg-dark-bg text-gray-100">
-    <div id="welcome-container" class="p-4 sm:p-8">
-      <h1 id="welcome-text" class="hidden sm:block">WELCOME</h1>
-      <div
-        class="relative z-10 w-full max-w-lg p-6 sm:p-10 bg-card-bg rounded-2xl shadow-2xl border border-gray-700 backdrop-blur-md bg-opacity-80"
-      >
-        <h2 class="text-3xl font-bold text-primary mb-8">
-          Benvenuto su TMDB Clone
-        </h2>
-        <section
-          class="mb-10 p-6 bg-gray-800 rounded-xl border border-gray-700"
-        >
-          <p class="text-xl font-semibold text-gray-300 mb-4">
-            Già iscritto?
-            <span class="text-primary">Effettua ora l'accesso:</span>
-          </p>
-          <form id="quick-login-form">
-            <div class="space-y-4">
-              <input
-                type="email"
-                id="login-email"
-                name="email"
-                required
-                placeholder="Inserisci la tua Email"
-                class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300"
-              />
-              <input
-                type="password"
-                id="login-password"
-                name="password"
-                required
-                placeholder="Password"
-                class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300"
-              />
-            </div>
-            <button
-              type="submit"
-              class="w-full mt-5 block text-center bg-primary text-white p-3 rounded-xl font-semibold text-lg hover:bg-blue-600 transition duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-primary/50 active:scale-[0.98]"
-            >
-              Accedi
+    
+</head>
+<body class="bg-dark-bg min-h-screen text-gray-100 p-4 sm:p-8">
+
+    <header class="flex flex-col sm:flex-row justify-between items-center mb-0 gap-4">
+        <h1 class="text-3xl font-bold text-primary tracking-wider">TMDB CLONE</h1>
+        <nav class="flex space-x-4">
+            <a href="home.html" class="text-primary hover:text-accent font-medium transition duration-300 border-b-2 border-primary">Home</a>
+            <a href="favorites.html" id="favorites-link" class="text-gray-300 hover:text-accent font-medium transition duration-300">Preferiti</a>
+            <button id="login-link" onclick="location.href='login.html'" class="bg-accent px-3 py-1 rounded-full text-white hover:bg-emerald-500 transition duration-300 shadow-lg">Accedi</button>
+            <a href="signup.html" id="signup-link" class="bg-primary px-3 py-1 rounded-full text-white hover:bg-blue-600 transition duration-300 shadow-lg">Registrati</a>
+            <button id="logout-button" class="bg-red-600 px-3 py-1 rounded-full text-white hover:bg-red-700 transition duration-300 shadow-lg hidden">
+                Logout
             </button>
-          </form>
-        </section>
-        <section class="mt-8">
-          <p class="text-gray-400 text-lg">
-            Non sei ancora iscritto? Iscriviti ora
-            <a
-              href="signup.html"
-              class="text-accent hover:text-green-500 font-bold transition duration-300 underline"
-            >
-              cliccando qui </a
-            >.
-          </p>
-        </section>
-      </div>
+        </nav>
+    </header>
+
+    <section class="mb-10 max-w-4xl mx-auto">
+        <div class="relative">
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Cerca un film, una serie TV..."
+                class="w-full p-4 pl-12 bg-card-bg border border-gray-700 rounded-xl text-lg focus:ring-2 focus:ring-primary focus:border-primary transition duration-300 shadow-xl"
+            />
+            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+    </section>
+
+    <main id="content-area" class="pb-10">
+        <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-2">Risultati di Ricerca / Film Popolari</h2>
+        
+        <div id="movie-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div class="movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl transition duration-500 hover:scale-[1.03] hover:shadow-primary/50 cursor-pointer">
+                <div class="loading-skeleton h-64 w-full"></div>
+                <div class="p-4">
+                    <h3 class="loading-skeleton h-6 w-3/4 mb-2"></h3>
+                    <p class="loading-skeleton h-4 w-1/2 mb-4"></p>
+                    <div class="flex justify-between mt-2">
+                        <div class="loading-skeleton h-8 w-1/3"></div>
+                        <div class="loading-skeleton h-8 w-1/3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movie-card bg-card-bg rounded-xl overflow-hidden shadow-2xl transition duration-500 hover:scale-[1.03] hover:shadow-primary/50 cursor-pointer hidden sm:block">
+                <div class="loading-skeleton h-64 w-full"></div>
+                <div class="p-4">
+                    <h3 class="loading-skeleton h-6 w-3/4 mb-2"></h3>
+                    <p class="loading-skeleton h-4 w-1/2 mb-4"></p>
+                    <div class="flex justify-between mt-2">
+                        <div class="loading-skeleton h-8 w-1/3"></div>
+                        <div class="loading-skeleton h-8 w-1/3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    
+    <footer class="mt-10 pt-4 border-t border-gray-800 text-center text-gray-500 text-sm">
+        <p>&copy; 2025 TMDB Clone. Tutti i diritti riservati.</p>
+    </footer>
+
+    <script type="module"></script>
+    <!-- Movie Details Modal -->
+    <div id="movie-details-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-card-bg rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative p-6">
+            <button id="close-modal" class="absolute top-3 right-3 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            <div id="modal-content" class="text-gray-100">
+                <h2 id="modal-title" class="text-3xl font-bold text-primary mb-4"></h2>
+                <div class="flex flex-col md:flex-row gap-6 mb-6">
+                    <img id="modal-poster" src="" alt="Poster" class="w-full md:w-1/3 rounded-lg shadow-lg object-cover">
+                    <div class="flex-1">
+                        <p id="modal-overview" class="text-gray-300 mb-4"></p>
+                        <p class="text-lg font-semibold">Valutazione: <span id="modal-rating" class="font-normal text-accent"></span></p>
+                        <p class="text-lg font-semibold">Cast: <span id="modal-cast" class="font-normal text-gray-300"></span></p>
+                    </div>
+                </div>
+                <div id="modal-trailer" class="mb-6">
+                    <!-- Trailer will be embedded here -->
+                </div>
+                <div id="modal-images" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                   
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script type="module" src="./js/index.js"></script>
     <script src="./js/index.js"></script>
-  </body>
+
+</body>
 </html>
+

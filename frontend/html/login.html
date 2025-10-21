@@ -1,56 +1,84 @@
 <!DOCTYPE html>
 <html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TMDB Clone - Benvenuto</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMDB Clone - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="stylesheet" href="../css/login.css" />
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary': '#3b82f6',
-                        'accent': '#10b981',
-                        'dark-bg': '#0d1117',
-                        'card-bg': '#1f2937',
-                    },
-                }
-            }
-        }
+      tailwind.config = {
+          theme: {
+              extend: {
+                  colors: {
+                      'primary': '#3b82f6', 
+                      'accent': '#10b981', 
+                      'dark-bg': '#0d1117',
+                      'card-bg': '#1f2937',
+                  },
+              }
+          }
+      }
     </script>
-</head>
-
-<body class="bg-dark-bg min-h-screen flex items-center justify-center p-4">
-
-
-    <div class="w-full max-w-md bg-card-bg p-8 rounded-2xl shadow-2xl border border-gray-700">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-bold text-primary mb-2">Accedi al tuo account</h2>
-            <p class="text-gray-400">Inserisci le tue credenziali per continuare</p>
-        </div>
-
-        <!-- Form di Login -->
-        <form id="login-form">
-            <div class="mb-5">
-                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
-                <input type="email" id="email" name="email" required placeholder="tua.email@esempio.com"
-                    class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300" />
+  </head>
+  <body class="bg-dark-bg text-gray-100">
+    <div id="welcome-container" class="p-4 sm:p-8">
+      <h1 id="welcome-text" class="hidden sm:block">WELCOME</h1>
+      <div
+        class="relative z-10 w-full max-w-lg p-6 sm:p-10 bg-card-bg rounded-2xl shadow-2xl border border-gray-700 backdrop-blur-md bg-opacity-80"
+      >
+        <h2 class="text-3xl font-bold text-primary mb-8">
+          Benvenuto su TMDB Clone
+        </h2>
+        <section
+          class="mb-10 p-6 bg-gray-800 rounded-xl border border-gray-700"
+        >
+          <p class="text-xl font-semibold text-gray-300 mb-4">
+            Già iscritto?
+            <span class="text-primary">Effettua ora l'accesso:</span>
+          </p>
+          <form id="quick-login-form">
+            <div class="space-y-4">
+              <input
+                type="email"
+                id="login-email"
+                name="email"
+                required
+                placeholder="Inserisci la tua Email"
+                class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300"
+              />
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                required
+                placeholder="Password"
+                class="w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300"
+              />
             </div>
-            <div class="mb-6">
-                <label for="password" class="block text-sm font-medium text-gray-300 mb-2">Password</label>
-                <input type="password" id="password" name="password" required placeholder="********"
-                    class="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-primary focus:border-primary text-gray-100 transition duration-300" />
-            </div>
-
-
-            <button type="submit" id="login-btn"
-                class="w-full bg-primary text-white p-3 rounded-xl font-semibold text-lg hover:bg-blue-600 transition duration-300 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary/50 active:scale-[0.98] mt-4">
-                Accedi
+            <button
+              type="submit"
+              class="w-full mt-5 block text-center bg-primary text-white p-3 rounded-xl font-semibold text-lg hover:bg-blue-600 transition duration-300 shadow-md focus:outline-none focus:ring-4 focus:ring-primary/50 active:scale-[0.98]"
+            >
+              Accedi
             </button>
-<script src="./js/login.js"></script>
-</body>
-
+          </form>
+        </section>
+        <section class="mt-8">
+          <p class="text-gray-400 text-lg">
+            Non sei ancora iscritto? Iscriviti ora
+            <a
+              href="signup.html"
+              class="text-accent hover:text-green-500 font-bold transition duration-300 underline"
+            >
+              cliccando qui </a
+            >.
+          </p>
+        </section>
+      </div>
+    </div>
+    <script src="./js/login.js"></script>
+  </body>
 </html>
