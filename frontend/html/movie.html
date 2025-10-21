@@ -241,21 +241,7 @@
 
     loadMovie();
     </script>
-    <script>
-    (function() {
-        const token = localStorage.getItem('token');
-        const loginLink = document.getElementById('login-link');
-        const logoutBtn = document.getElementById('logout-button');
-        if (token) {
-            if (loginLink) loginLink.style.display = 'none';
-            if (logoutBtn) logoutBtn.classList.remove('hidden');
-        } else {
-            if (loginLink) loginLink.style.display = '';
-            if (logoutBtn) logoutBtn.classList.add('hidden');
-        }
-        if (logoutBtn) logoutBtn.addEventListener('click', () => { localStorage.removeItem('token'); location.reload(); });
-    })();
-    </script>
+   
 </body>
 </html>
 
