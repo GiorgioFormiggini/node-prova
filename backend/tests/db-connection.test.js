@@ -26,31 +26,31 @@ async function testDBConnection() {
     const conn = await mongoose.connect(mongoURI, options);
     
     // Se la connessione ha successo, mostra informazioni sul database
-    console.log('✅ Connessione a MongoDB stabilita con successo!');
-    console.log(`📡 Server MongoDB: ${conn.connection.host}`);
-    console.log(`🗄️ Database: ${conn.connection.name}`);
-    console.log(`🔌 Stato connessione: ${conn.connection.readyState === 1 ? 'Attiva' : 'Non attiva'}`);
+    console.log('✅Connessione a MongoDB stabilita con successo!');
+    console.log(`Server MongoDB: ${conn.connection.host}`);
+    console.log(`Database: ${conn.connection.name}`);
+    console.log(`Stato connessione: ${conn.connection.readyState === 1 ? 'Attiva' : 'Non attiva'}`);
     
     // Verifica se possiamo accedere alle collezioni
     const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log(`📚 Collezioni disponibili: ${collections.length}`);
+    console.log(`Collezioni disponibili: ${collections.length}`);
     if (collections.length > 0) {
-      console.log('📋 Elenco collezioni:');
+      console.log('Elenco collezioni:');
       collections.forEach(collection => {
         console.log(`   - ${collection.name}`);
       });
     } else {
-      console.log('ℹ️ Nessuna collezione presente nel database.');
+      console.log('Nessuna collezione presente nel database.');
     }
     
     // Chiudi la connessione dopo il test
     await mongoose.connection.close();
-    console.log('🔒 Connessione chiusa.');
+    console.log('Connessione chiusa.');
     
     return true;
   } catch (error) {
     // Se la connessione fallisce, mostra l'errore
-    console.error('❌ Test di connessione fallito:');
+    console.error('Test di connessione fallito:');
     console.error(error);
     return false;
   }

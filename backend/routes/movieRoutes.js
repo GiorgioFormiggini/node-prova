@@ -3,9 +3,9 @@ const express = require('express');
 const router = express.Router();
 
 // import controllers
-const movieController = require('../controllers/movieController');
+const movieController = require('../controller/movieController');
 const verifyToken = require('../middleware/authMiddleware');
-const favoriteController = require('../controllers/favoriteController');
+const favoriteController = require('../controller/favoriteController');
 
 // Ricerca film popolari (pubblico)
 router.get('/popular', movieController.fetchPopularMovies);
